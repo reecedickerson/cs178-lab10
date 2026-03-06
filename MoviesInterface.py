@@ -15,10 +15,12 @@ def get_table():
     return dynamodb.Table('Movies')
 
 def create_movie():
-    """
-    Prompt user for a Movie Title.
-    Add the movie to the database with the title and an empty Ratings list.
-    """
+    title = input("What is the title of the new movie? ")
+    table.update_item(
+        Key={"Title": title},
+        UpdateExpression="SET Ratings = :r",
+        ExpressionAttributeValues={':r': []}
+    )
     print("creating a movie")
 
 def print_movie(movie):
@@ -55,11 +57,17 @@ def print_all_movies():
         print_movie(movie)
 
 def update_rating():
-    """
-    Prompt user for a Movie Title.
-    Prompt user for a rating (integer).
-    Append the rating to the movie's Ratings list in the database.
-    """
+    try:
+        title = input("What is the movie title? ")
+        rating = int(input("What is the rating (integer): "))
+        table.update_item(
+            Key={"Title": title},
+            UpdateExpression="SET Ratings = list_append(Ratings, :r)",
+            ExpressionAttributeValues={':r': [rating]}
+        )
+    except Exception:
+        print("Error in updating movie rating")
+
     print("updating rating")
 
 def delete_movie():
